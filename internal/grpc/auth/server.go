@@ -1,6 +1,6 @@
 package auth
 
-import ssov1 "github.com/Effly/auth-grpc/protos/gen/go/sso"
+import ssov1 "github.com/Effly/protos/gen/go/sso"
 
 type serverAPI struct {
 	ssov1.UnimplementedAuthServer
