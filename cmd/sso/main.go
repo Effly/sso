@@ -1,10 +1,13 @@
 package main
 
 import (
+	"github.com/Effly/sso/internal/app"
+	"github.com/Effly/sso/internal/config"
+	"github.com/Effly/sso/internal/lib/logger/handlers/slogpretty"
 	"log/slog"
 	"os"
-	"sso/internal/config"
-	"sso/internal/lib/logger/handlers/slogpretty"
+	"os/signal"
+	"syscall"
 )
 
 const (
@@ -20,9 +23,20 @@ func main() {
 
 	log.Info("starting application", slog.Any("config", cfg)) // todo clear it
 
-	// TODO: init app
+	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
 
-	// TODO: run grpc-server
+	go application.GRPCSrv.MustRun()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	sign := <-stop
+
+	log.Info("received signal", slog.Any("signal", sign.String()))
+
+	application.GRPCSrv.Stop()
+
+	log.Info("application stopped")
 }
 
 func setUpLogger(env string) *slog.Logger {
