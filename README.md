@@ -1,1 +1,1 @@
-# auth-grpc
+# sso
